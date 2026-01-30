@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle Productivity Helper</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚔️ Idle Productivity Helper</h1>
+            <div class="resources">
+                <span class="resource">⚡ Strategic Points: <span id="strategic-points">0</span></span>
+                <span class="resource">🎖️ Command Tokens: <span id="command-tokens">0</span></span>
+                <span class="resource">🏆 Streak: <span id="streak">0</span> days</span>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab active" data-tab="activities">Activities</button>
+            <button class="tab" data-tab="war-table">War Table</button>
+            <button class="tab" data-tab="camp">Camp</button>
+        </nav>
+
+        <!-- Activities Tab -->
+        <section id="activities-tab" class="tab-content active">
+            <div class="section-header">
+                <h2>Your Tasks</h2>
+                <button id="add-activity-btn" class="btn-primary">+ Add Activity</button>
+            </div>
+            <div id="activities-list" class="activities-list"></div>
+            <div id="check-in-section" class="check-in-section">
+                <button id="check-in-btn" class="btn-large">✅ Check In</button>
+                <div id="reward-summary" class="reward-summary"></div>
+            </div>
+        </section>
+
+        <!-- War Table Tab -->
+        <section id="war-table-tab" class="tab-content">
+            <div class="section-header">
+                <h2>War Table</h2>
+                <div class="war-table-info">
+                    <span>Unlocked Slots: <span id="unlocked-slots">1</span>/9</span>
+                </div>
+            </div>
+            <div id="war-table-grid" class="war-table-grid"></div>
+            <div class="war-table-actions">
+                <button id="deploy-btn" class="btn-large">⚔️ Deploy & Battle</button>
+                <button id="clear-placement-btn" class="btn-secondary">Clear Placement</button>
+            </div>
+            <div id="battle-result" class="battle-result"></div>
+        </section>
+
+        <!-- Camp Tab -->
+        <section id="camp-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Your Camp</h2>
+            </div>
+            <div id="camp-view" class="camp-view">
+                <div class="camp-visual">
+                    <div class="camp-building" id="camp-building">🏕️</div>
+                </div>
+                <div id="upgrades-list" class="upgrades-list"></div>
+            </div>
+        </section>
+
+        <!-- Modals -->
+        <div id="add-activity-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Add Activity</h2>
+                <form id="add-activity-form">
+                    <label>Activity Name:</label>
+                    <input type="text" id="activity-name" required>
+                    
+                    <label>Category:</label>
+                    <select id="activity-category" required>
+                        <option value="physical">Physical (Gym/Sport)</option>
+                        <option value="mental">Mental (Study/Work)</option>
+                        <option value="creative">Creative (Art/Writing)</option>
+                        <option value="logistics">Logistics (Chores/Admin)</option>
+                    </select>
+                    
+                    <label>Frequency:</label>
+                    <select id="activity-frequency" required>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                    
+                    <label>Minimum Effort (minutes):</label>
+                    <input type="number" id="activity-effort" min="1" value="30" required>
+                    
+                    <button type="submit" class="btn-primary">Add Activity</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="upgrade-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Upgrade Army</h2>
+                <div id="upgrade-options"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
