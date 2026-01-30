@@ -115,3 +115,81 @@ and easy to read.
 2. Create wireframes for the check-in flow.
 3. Draft a small art style guide.
 4. Prototype the task-completion to reward loop.
+
+## Implementation Plan
+This plan builds the Mini-Army Simulator mechanics, Strategic Deployment,
+and Troop Evolution into an MVP that stays fast and non-distracting.
+
+### Phase 0: Product Definition (1 week)
+- Lock the scope for MVP: goal setup, task logging, War Table placement,
+  auto-battle, troop evolution (Level 1/3/5), and reward mapping.
+- Finalize the army roster and evolution table (Infantry, Ranged, Magic,
+  Cavalry, Alchemists, Beasts, Constructs).
+- Define the activity categories (Physical, Mental, Creative, Logistics)
+  and their stat effects.
+- Draft a single player journey for a 7-day onboarding flow.
+
+### Phase 1: UX + Visual Foundations (1-2 weeks)
+- Wireframes:
+  - Onboarding: create activities + choose starting troop.
+  - Daily check-in: task list + reward summary.
+  - War Table: 3x3 grid, squad slots, deploy button.
+  - Camp view: buildings, upgrades, progression map.
+- Style guide:
+  - Palette, typography, icon set, UI components.
+  - Unit sprite tiers (Recruit, Veteran, Elite).
+- Define animation budget: short, readable battle loops under 30 seconds.
+
+### Phase 2: Data Model + Core Systems (2 weeks)
+- Data structures:
+  - Activities: frequency, minimum effort, reward weight.
+  - Tasks log: date, category, completion.
+  - Army: troop types, platoon size, evolution level.
+  - Squad slots: slot count, assigned platoon.
+  - Resources: Strategic Points, Command Tokens, gold, morale.
+- Progression rules:
+  - Task completion -> reward mapping -> stat scaling.
+  - Evolution thresholds (Level 1 -> 3 -> 5).
+  - Gentle streak adjustments.
+- Local storage for offline-first usage.
+
+### Phase 3: War Table + Auto-Battle Prototype (2 weeks)
+- Grid placement UI for squad slots.
+- Auto-battle simulation:
+  - Simple AI by class (frontline, ranged, magic, support).
+  - Fast deterministic loop with clear battle outcome.
+  - No-loss retreat and reinforcement bonuses.
+- Battle summary screen:
+  - Total damage, units evolved, resources earned.
+
+### Phase 4: Activity-to-Army Loop (1-2 weeks)
+- Check-in flow:
+  - Mark tasks complete.
+  - Show mapped buffs to troop types.
+  - Award Strategic Points and Command Tokens.
+- Upgrade actions:
+  - Expand slot.
+  - Diversify troop type.
+  - Specialize (evolve) platoon.
+- Visual progression updates:
+  - Camp building unlocks by troop type.
+  - Unit sprites tiered by evolution.
+
+### Phase 5: MVP Polish (1 week)
+- Performance pass: fast loading, no heavy animations.
+- Usability pass: check-in in under 60 seconds.
+- Add guidance text for new users and a short in-game tutorial.
+- Basic analytics or local stats recap (weekly summary).
+
+### Phase 6: Validation + Iteration (ongoing)
+- Playtest with 5-10 users focusing on:
+  - Clarity of task-to-reward mapping.
+  - Whether battles feel rewarding without being distracting.
+  - Time-to-check-in and return to work.
+- Adjust balance: reward weights, evolution thresholds,
+  and slot unlock pacing.
+
+## Implementation Notes
+- MVP should avoid real-time pressure; no timers beyond optional focus mode.
+- Use short animations and skip buttons for battles.
+- Prefer local-only storage with optional account sync later.
