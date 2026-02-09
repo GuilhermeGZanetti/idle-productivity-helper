@@ -105,6 +105,30 @@
         </div>
     </div>
 
+    <!-- Battle Arena Overlay -->
+    <div id="battle-arena-overlay" class="battle-arena-overlay">
+        <div class="battle-hud">
+            <div class="battle-hud-left">
+                <div id="turn-banner" class="turn-banner player-turn">Your Turn</div>
+                <div id="turn-number" class="turn-number">Turn 1</div>
+                <div id="troop-counts" class="troop-counts"></div>
+            </div>
+            <div class="battle-hud-center">
+                <div id="unit-info-panel" class="unit-info-panel hidden"></div>
+            </div>
+            <div class="battle-hud-right">
+                <button id="end-turn-btn" class="end-turn-btn">End Turn</button>
+            </div>
+        </div>
+        <canvas id="battle-canvas"></canvas>
+        <div id="battle-outcome-overlay" class="battle-outcome-overlay hidden">
+            <div id="battle-outcome-text" class="battle-outcome-text"></div>
+            <button id="battle-close-btn" class="btn-large battle-close-btn">Continue</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="battle3d.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

@@ -451,58 +451,46 @@ function clearPlacement() {
 
 // Battle System
 function startBattle() {
-    const deployedPlatoons = gameState.squadSlots
-        .filter(slot => slot.unlocked && slot.platoon)
-        .map(slot => slot.platoon);
+    const deployedSlots = gameState.squadSlots
+        .filter(slot => slot.unlocked && slot.platoon);
+    const deployedPlatoons = deployedSlots.map(slot => slot.platoon);
 
     if (deployedPlatoons.length === 0) {
         alert('Deploy at least one platoon to battle!');
         return;
     }
 
-    // Calculate army stats
-    let totalHP = 0;
-    let totalDamage = 0;
-    let totalUnits = 0;
-
-    deployedPlatoons.forEach(platoon => {
+    // Build player platoon data for 3D battle
+    const playerPlatoons = deployedSlots.map(slot => {
+        const platoon = slot.platoon;
         const troop = TROOP_TYPES[platoon.type];
         const evolution = troop.evolution[platoon.evolutionLevel];
-        totalHP += evolution.hp * evolution.count;
-        totalDamage += evolution.damage * evolution.count;
-        totalUnits += evolution.count;
+        return {
+            slotId: slot.id,
+            type: platoon.type,
+            evolutionLevel: platoon.evolutionLevel,
+            count: evolution.count,
+            hp: evolution.hp,
+            damage: evolution.damage
+        };
     });
 
     // Enemy stats (scales with player progress)
     const enemyPower = 100 + (gameState.campLevel * 50);
-    const enemyHP = enemyPower * 2;
-    const enemyDamage = enemyPower;
 
-    // Simulate battle
-    let playerHP = totalHP;
-    let enemyHPLeft = enemyHP;
-    const battleLog = [];
+    // Launch hex-grid tactical battle
+    Battle3D.startBattle({
+        playerPlatoons,
+        enemyPower,
+        onComplete: (result) => {
+            applyBattleRewards(result, deployedPlatoons, enemyPower);
+        }
+    });
+}
 
-    // Simple battle simulation
-    let turn = 0;
-    while (playerHP > 0 && enemyHPLeft > 0 && turn < 50) {
-        turn++;
-        // Player attacks
-        const playerDamage = totalDamage * (0.8 + Math.random() * 0.4);
-        enemyHPLeft -= playerDamage;
-        battleLog.push(`Turn ${turn}: Your army deals ${Math.floor(playerDamage)} damage!`);
+function applyBattleRewards(result, deployedPlatoons, enemyPower) {
+    const victory = result.victory;
 
-        if (enemyHPLeft <= 0) break;
-
-        // Enemy attacks
-        const enemyDamageDealt = enemyDamage * (0.8 + Math.random() * 0.4);
-        playerHP -= enemyDamageDealt;
-        battleLog.push(`Enemy deals ${Math.floor(enemyDamageDealt)} damage!`);
-    }
-
-    const victory = enemyHPLeft <= 0;
-    
-    // Battle rewards
     let battleRewards = {
         strategicPoints: 0,
         commandTokens: 0,
@@ -514,11 +502,9 @@ function startBattle() {
         battleRewards.commandTokens = Math.floor(enemyPower * 0.1);
         battleRewards.xp = Math.floor(enemyPower * 0.3);
         gameState.campLevel++;
-        
-        // Award XP to platoons
+
         deployedPlatoons.forEach(platoon => {
             platoon.xp += battleRewards.xp;
-            // Evolution happens through upgrade system, not auto
         });
     } else {
         battleRewards.strategicPoints = Math.floor(enemyPower * 0.2);
@@ -528,7 +514,7 @@ function startBattle() {
     gameState.strategicPoints += battleRewards.strategicPoints;
     gameState.commandTokens += battleRewards.commandTokens;
 
-    // Show battle result
+    // Show battle result in the War Table tab as well
     const resultEl = document.getElementById('battle-result');
     resultEl.className = `battle-result show ${victory ? 'victory' : 'defeat'}`;
     resultEl.innerHTML = `
@@ -537,10 +523,6 @@ function startBattle() {
         <div class="reward-item">⚡ +${battleRewards.strategicPoints} Strategic Points</div>
         <div class="reward-item">🎖️ +${battleRewards.commandTokens} Command Tokens</div>
         ${victory ? `<div class="reward-item">🏕️ Camp Level: ${gameState.campLevel}</div>` : ''}
-        <details style="margin-top: 10px;">
-            <summary>Battle Log</summary>
-            <pre style="font-size: 0.8em; margin-top: 10px;">${battleLog.slice(0, 10).join('\n')}</pre>
-        </details>
     `;
 
     saveGameState();
