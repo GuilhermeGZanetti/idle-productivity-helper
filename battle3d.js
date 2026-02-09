@@ -379,12 +379,14 @@ const Battle3D = (() => {
         
         // Power brackets: [100,300]→2-3, [300,700]→3-4, [700,1000]→4-5, etc.
         const brackets = [
-            { maxPower: 400,  min: 2, max: 3 },
+            { maxPower: 300,  min: 1, max: 2 },
+            { maxPower: 500,  min: 2, max: 3 },
             { maxPower: 900,  min: 3, max: 4 },
-            { maxPower: 1500, min: 4, max: 5 },
-            { maxPower: 2000, min: 5, max: 6 },
-            { maxPower: 2800, min: 6, max: 7 },
-            { maxPower: 3500, min: 7, max: 9 },
+            { maxPower: 1400, min: 4, max: 5 },
+            { maxPower: 1900, min: 5, max: 6 },
+            { maxPower: 2300, min: 6, max: 7 },
+            { maxPower: 2900, min: 7, max: 8 },
+            { maxPower: 3500, min: 8, max: 9 },
         ];
         let minU = 8, maxU = 9; // fallback for very high power
         for (const b of brackets) {
