@@ -537,17 +537,30 @@ function renderCamp() {
 }
 
 function createPresetHeroName() {
-    const idx = (gameState.nextHeroId - 1) % HERO_NAME_POOL.length;
-    const baseName = HERO_NAME_POOL[idx];
+    const baseName = HERO_NAME_POOL[Math.floor(Math.random() * HERO_NAME_POOL.length)];
     const sameNameCount = gameState.heroes.filter(hero => hero.name.startsWith(baseName)).length;
-    return sameNameCount > 0 ? `${baseName} ${sameNameCount + 1}` : baseName;
+    return sameNameCount > 0 ? `${baseName}, the ${sameNameCount + 1}°` : baseName;
 }
 
 function getRandomHeroClassKey() {
     const classKeys = Object.keys(HERO_CLASSES).filter(
         key => gameState.campLevel >= HERO_CLASSES[key].campLevel
     );
-    return classKeys[Math.floor(Math.random() * classKeys.length)];
+
+    // Weight inversely by how many heroes of each class you already own.
+    // weight = 1 / (1 + count), so 0 owned → weight 1, 1 owned → 0.5, 2 → 0.33, etc.
+    const counts = {};
+    gameState.heroes.forEach(h => { counts[h.classKey] = (counts[h.classKey] || 0) + 1; });
+
+    const weights = classKeys.map(key => 1 / (1 + (counts[key] || 0)));
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+    let roll = Math.random() * totalWeight;
+    for (let i = 0; i < classKeys.length; i++) {
+        roll -= weights[i];
+        if (roll <= 0) return classKeys[i];
+    }
+    return classKeys[classKeys.length - 1];
 }
 
 function getNextHeroId() {
