@@ -24,8 +24,5 @@ const HERO_NAME_POOL = [
     'Gabriel', 'Camila', 'Diego', 'Larissa', 'Bruno', 'Amanda', 'Felipe', 'Mariana',
     'Thiago', 'Bianca', 'Roberto', 'Carol', 'Leonardo', 'Aline', 'Marcos', 'Natália',
     'Anderson', 'Letícia', 'Renato', 'Bruna', 'Vinicius', 'Tatiana', 'Ricardo', 'Vanessa',
-    'Eduardo', 'Juliana', 'Guilherme', 'Larissa', 'Felipe', 'Camila', 'Rafael', 'Julia',
-    'Gabriel', 'Camila', 'Diego', 'Larissa', 'Bruno', 'Amanda', 'Felipe', 'Mariana',
-    'Thiago', 'Bianca', 'Roberto', 'Carol', 'Leonardo', 'Aline', 'Marcos', 'Natália',
-    'Anderson', 'Letícia', 'Renato', 'Bruna', 'Vinicius', 'Tatiana', 'Ricardo', 'Vanessa',
+    'Eduardo', 'Juliana', 'Guilherme', 
 ];
