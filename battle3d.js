@@ -394,8 +394,8 @@ const Battle3D = (() => {
         }
         const numUnits = Math.min(9, minU + Math.floor(Math.random() * (maxU - minU + 1)));
         // power 100 - 0.5x ---- power 200 - 0.6x
-        const baseHP = 50 + power * 0.1;
-        const baseDmg = 20 + power * 0.04;
+        const baseHP = 50 + power * 0.15;
+        const baseDmg = 20 + power * 0.06;
 
         // Filter pool to templates unlocked at this power level.
         const available = ENEMY_POOL.filter(t => power >= t.minPower);

@@ -17,7 +17,7 @@ const HERO_CLASSES = {
 };
 
 const gameState = {
-    strategicPoints: 0,
+    strategicPoints: 130,
     commandTokens: 0, // kept only for compatibility with older saves
     streak: 0,
     lastCheckIn: null,
@@ -184,7 +184,9 @@ function getHeroStats(hero) {
 }
 
 function getHeroUpgradeCost(hero) {
-    return 55 + (hero.level * 45);
+    const baseCost = 55 + (hero.level * 45);
+    const xpDiscount = Math.floor(hero.xp / 4);
+    return Math.max(1, baseCost - xpDiscount);
 }
 
 function getCampTaskMultiplier() {
@@ -360,7 +362,7 @@ function startBattle() {
 
 function applyBattleRewards(result, deployedHeroes) {
     const victory = result.victory;
-    const strategicPoints = victory ? 35 : 16;
+    const strategicPoints = victory ? 26 : 8;
     const heroXP = victory ? 14 : 6;
 
     gameState.strategicPoints += strategicPoints;
@@ -518,7 +520,7 @@ function renderCamp() {
             <div class="hero-main">
                 <h3>${heroClass.emoji} ${hero.name}</h3>
                 <p>${heroClass.name} • Level ${hero.level}</p>
-                <p>HP ${stats.hp} • ATK ${stats.damage} • XP ${hero.xp}</p>
+                <p>HP ${stats.hp} • ATK ${stats.damage} • XP ${hero.xp} (-${Math.floor(hero.xp / 4)} ⚡ discount)</p>
                 <p>${isAssigned ? 'Assigned to War Table' : 'Reserve hero'}</p>
             </div>
             <div class="hero-actions">
