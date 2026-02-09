@@ -34,12 +34,30 @@ const Battle3D = (() => {
         constructs: 0x556677
     };
 
-    const ENEMY_TEMPLATES = [
-        { type: 'infantry',  hpF: 1.0, dmgF: 1.0, mobility: 2, range: 1 },
-        { type: 'ranged',    hpF: 0.6, dmgF: 1.4, mobility: 2, range: 3 },
-        { type: 'cavalry',   hpF: 0.8, dmgF: 0.9, mobility: 3, range: 1 },
-        { type: 'magic',     hpF: 0.5, dmgF: 1.8, mobility: 1, range: 2 }
+    // Tiered enemy pools — new types unlock as enemyPower grows (driven by camp level).
+    const ENEMY_POOL = [
+        // Always available (tier 1, power >= 0)
+        { type: 'infantry',   hpF: 1.0, dmgF: 1.0, mobility: 2, range: 1, minPower: 0   },
+        { type: 'ranged',     hpF: 0.5, dmgF: 0.7, mobility: 2, range: 4, minPower: 0   },
+        // Tier 2 (power >= 500, ~camp level 5)
+        { type: 'cavalry',    hpF: 0.8, dmgF: 1.1, mobility: 3, range: 1, minPower: 600 },
+        { type: 'beasts',     hpF: 0.7, dmgF: 1.3, mobility: 3, range: 1, minPower: 2500 },
+        // Tier 3 (power >= 700, ~camp level 7)
+        { type: 'magic',      hpF: 0.5, dmgF: 1.2, mobility: 1, range: 3, minPower: 1100 },
+        { type: 'alchemists', hpF: 0.6, dmgF: 1.5, mobility: 2, range: 2, minPower: 1700 },
+        // Tier 4 (power >= 1200, ~camp level 12)
+        { type: 'constructs', hpF: 2.5, dmgF: 1.0, mobility: 1, range: 1, minPower: 2800 },
     ];
+
+    const ENEMY_COLORS = {
+        infantry:   0xcc3333,
+        ranged:     0xbb4422,
+        magic:      0x882266,
+        cavalry:    0xaa5522,
+        alchemists: 0x998822,
+        beasts:     0x664444,
+        constructs: 0x555566
+    };
 
     // ===================== GRID MATH =====================
     function hexKey(q, r) { return q + ',' + r; }
@@ -358,12 +376,36 @@ const Battle3D = (() => {
     }
 
     function generateEnemyArmy(power) {
-        const numUnits = Math.min(6, Math.max(3, 2 + Math.floor(power / 150)));
-        const baseHP = power * 2.2;
-        const baseDmg = power * 0.4;
+        
+        // Power brackets: [100,300]→2-3, [300,700]→3-4, [700,1000]→4-5, etc.
+        const brackets = [
+            { maxPower: 400,  min: 2, max: 3 },
+            { maxPower: 900,  min: 3, max: 4 },
+            { maxPower: 1500, min: 4, max: 5 },
+            { maxPower: 2000, min: 5, max: 6 },
+            { maxPower: 2800, min: 6, max: 7 },
+            { maxPower: 3500, min: 7, max: 9 },
+        ];
+        let minU = 8, maxU = 9; // fallback for very high power
+        for (const b of brackets) {
+            if (power <= b.maxPower) { minU = b.min; maxU = b.max; break; }
+        }
+        const numUnits = Math.min(9, minU + Math.floor(Math.random() * (maxU - minU + 1)));
+        // power 100 - 0.5x ---- power 200 - 0.6x
+        const baseHP = 50 + power * 0.1;
+        const baseDmg = 20 + power * 0.04;
+
+        // Filter pool to templates unlocked at this power level.
+        const available = ENEMY_POOL.filter(t => power >= t.minPower);
+
+        // Build a randomised roster from the available pool.
+        // Guarantee at least one melee unit so the AI can engage.
+        const meleePool = available.filter(t => t.range === 1);
         const units = [];
+
         for (let i = 0; i < numUnits; i++) {
-            const t = ENEMY_TEMPLATES[i % ENEMY_TEMPLATES.length];
+            const pool = (i === 0 && meleePool.length > 0) ? meleePool : available;
+            const t = pool[Math.floor(Math.random() * pool.length)];
             units.push({
                 type: t.type,
                 hp: Math.floor(baseHP * t.hpF),
@@ -408,24 +450,91 @@ const Battle3D = (() => {
         const s = 0.85 + (evolutionLevel - 1) * 0.1;
 
         if (side === 'enemy') {
-            // enemy: dark red soldiers
-            const body = box(0.9, 1.5, 0.7, 0xcc3333, 0.3);
-            body.position.y = 1;
-            group.add(body);
-            const head = sphere(0.3, 0xddccbb);
-            head.position.y = 2;
-            group.add(head);
-            // red eyes
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-            [-0.1, 0.1].forEach(z => {
-                const eye = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), eyeMat);
-                eye.position.set(0.25, 2.05, z);
-                group.add(eye);
-            });
-            const sword = box(0.08, 0.9, 0.14, 0x444444, 0.6);
-            sword.position.set(0.5, 1.2, 0);
-            sword.rotation.z = -0.3;
-            group.add(sword);
+            // Distinct enemy meshes per type, tinted with enemy palette
+            const ec = ENEMY_COLORS[type] || 0xcc3333;
+            switch (type) {
+                case 'ranged': {
+                    group.add(positioned(cyl(0.28, 0.32, 1.3, ec), 0, 0.95, 0));
+                    group.add(positioned(sphere(0.26, 0xccbbaa), 0, 1.85, 0));
+                    const bow = new THREE.Mesh(new THREE.TorusGeometry(0.45, 0.04, 6, 10, Math.PI),
+                        new THREE.MeshStandardMaterial({ color: 0x553311 }));
+                    bow.position.set(0.45, 1.2, 0);
+                    bow.rotation.z = Math.PI / 2;
+                    group.add(bow);
+                    break;
+                }
+                case 'magic': {
+                    group.add(positioned(cone(0.45, 1.5, ec), 0, 1, 0));
+                    group.add(positioned(sphere(0.26, 0xccbbaa), 0, 2, 0));
+                    group.add(positioned(cone(0.3, 0.55, darken(ec, 0.5)), 0, 2.5, 0));
+                    const orb = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8),
+                        new THREE.MeshStandardMaterial({ color: 0xff6666, emissive: ec, emissiveIntensity: 0.5 }));
+                    orb.position.set(0.55, 1.4, 0);
+                    group.add(orb);
+                    break;
+                }
+                case 'cavalry': {
+                    const horse = box(1.4, 0.7, 0.65, 0x553311, 0);
+                    horse.position.y = 0.6;
+                    group.add(horse);
+                    for (const lx of [-0.4, 0.4]) {
+                        for (const lz of [-0.18, 0.18]) {
+                            group.add(positioned(cyl(0.07, 0.07, 0.5, 0x442200), lx, 0.25, lz));
+                        }
+                    }
+                    group.add(positioned(box(0.45, 0.8, 0.45, ec, 0), 0, 1.45, 0));
+                    group.add(positioned(sphere(0.2, 0xccbbaa), 0, 2.1, 0));
+                    break;
+                }
+                case 'alchemists': {
+                    group.add(positioned(cyl(0.3, 0.35, 1.2, ec), 0, 0.9, 0));
+                    group.add(positioned(sphere(0.26, 0xccbbaa), 0, 1.8, 0));
+                    const flask = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8),
+                        new THREE.MeshStandardMaterial({ color: 0xcc4444, emissive: 0xaa2222, emissiveIntensity: 0.3, transparent: true, opacity: 0.8 }));
+                    flask.position.set(0.45, 1.1, 0);
+                    group.add(flask);
+                    break;
+                }
+                case 'beasts': {
+                    group.add(positioned(box(1.1, 0.55, 0.6, 0x553333, 0), 0, 0.45, 0));
+                    group.add(positioned(box(0.45, 0.35, 0.4, 0x664444, 0), 0.6, 0.55, 0));
+                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                    [-0.08, 0.08].forEach(z => {
+                        const e = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), eyeM);
+                        e.position.set(0.75, 0.65, z);
+                        group.add(e);
+                    });
+                    break;
+                }
+                case 'constructs': {
+                    group.add(positioned(box(0.9, 1.6, 0.8, 0x445566, 0.5), 0, 1, 0));
+                    group.add(positioned(box(0.55, 0.45, 0.55, 0x556677, 0.4), 0, 2.1, 0));
+                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xff2222 });
+                    [-0.12, 0.12].forEach(z => {
+                        const e = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM);
+                        e.position.set(0.15, 2.15, z);
+                        group.add(e);
+                    });
+                    break;
+                }
+                default: { // infantry and any unknown
+                    const body = box(0.9, 1.5, 0.7, ec, 0.3);
+                    body.position.y = 1;
+                    group.add(body);
+                    group.add(positioned(sphere(0.3, 0xccbbaa), 0, 2, 0));
+                    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                    [-0.1, 0.1].forEach(z => {
+                        const eye = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), eyeMat);
+                        eye.position.set(0.25, 2.05, z);
+                        group.add(eye);
+                    });
+                    const sword = box(0.08, 0.9, 0.14, 0x444444, 0.6);
+                    sword.position.set(0.5, 1.2, 0);
+                    sword.rotation.z = -0.3;
+                    group.add(sword);
+                    break;
+                }
+            }
         } else {
             switch (type) {
                 case 'infantry': {

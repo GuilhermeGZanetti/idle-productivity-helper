@@ -12,7 +12,6 @@
             <h1>⚔️ Idle Productivity Helper</h1>
             <div class="resources">
                 <span class="resource">⚡ Strategic Points: <span id="strategic-points">0</span></span>
-                <span class="resource">🎖️ Command Tokens: <span id="command-tokens">0</span></span>
                 <span class="resource">🏆 Streak: <span id="streak">0</span> days</span>
             </div>
         </header>
@@ -30,10 +29,7 @@
                 <button id="add-activity-btn" class="btn-primary">+ Add Activity</button>
             </div>
             <div id="activities-list" class="activities-list"></div>
-            <div id="check-in-section" class="check-in-section">
-                <button id="check-in-btn" class="btn-large">✅ Check In</button>
-                <div id="reward-summary" class="reward-summary"></div>
-            </div>
+            <div id="reward-summary" class="reward-summary"></div>
         </section>
 
         <!-- War Table Tab -->
@@ -60,6 +56,7 @@
             <div id="camp-view" class="camp-view">
                 <div class="camp-visual">
                     <div class="camp-building" id="camp-building">🏕️</div>
+                    <div id="camp-stats" class="camp-stats"></div>
                 </div>
                 <div id="upgrades-list" class="upgrades-list"></div>
             </div>
@@ -99,7 +96,7 @@
         <div id="upgrade-modal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <h2>Upgrade Army</h2>
+                <h2 id="upgrade-modal-title">Manage Slot</h2>
                 <div id="upgrade-options"></div>
             </div>
         </div>

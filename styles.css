@@ -179,24 +179,16 @@ header h1 {
     align-items: center;
 }
 
-.checkbox {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-}
-
-.check-in-section {
-    margin-top: 30px;
-    padding: 20px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    text-align: center;
+.task-action-btn {
+    padding: 8px 12px;
+    font-size: 0.9em;
 }
 
 .reward-summary {
-    margin-top: 15px;
+    margin-top: 20px;
     padding: 15px;
     background: white;
+    border: 2px solid #e0e0e0;
     border-radius: 6px;
     display: none;
 }
@@ -305,11 +297,55 @@ header h1 {
     margin: 20px;
 }
 
+.camp-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.camp-stat {
+    font-size: 1em;
+    color: #555;
+}
+
+.camp-locked {
+    font-size: 0.88em;
+    color: #999;
+}
+
 .upgrades-list {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 15px;
+}
+
+.hero-card {
+    background: #f9f9f9;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.hero-main h3 {
+    margin-bottom: 6px;
+}
+
+.hero-main p {
+    color: #666;
+    font-size: 0.92em;
+    margin-bottom: 4px;
+}
+
+.hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .upgrade-card {
