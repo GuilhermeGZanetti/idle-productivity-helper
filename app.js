@@ -1,7 +1,3 @@
-const HERO_NAME_POOL = [
-    'Aldric', 'Mira', 'Thorne', 'Lyra', 'Garrick', 'Selene', 'Borin', 'Nadia',
-    'Kael', 'Iris', 'Orin', 'Talia', 'Vera', 'Dorian', 'Fen', 'Cassia'
-];
 const TASK_BASE_POINTS = 90;
 const TASK_CAMP_MULTIPLIER_STEP = 0.15;
 const TASK_STREAK_MULTIPLIER_STEP = 0.05;
@@ -455,7 +451,11 @@ function upgradeHero(heroId) {
 function dismissHero(heroId) {
     const hero = getHeroById(heroId);
     if (!hero) return;
-    if (!confirm(`Dismiss ${hero.name}? You will receive ${HERO_DISMISS_REFUND} Strategic Points.`)) return;
+    const isDeployed = gameState.squadSlots.some(slot => slot.heroId === heroId);
+    const msg = isDeployed
+        ? `${hero.name} is currently deployed on the War Table! Dismissing will remove them from battle formation.\n\nDismiss ${hero.name} for ${HERO_DISMISS_REFUND} Strategic Points?`
+        : `Dismiss ${hero.name}? You will receive ${HERO_DISMISS_REFUND} Strategic Points.`;
+    if (!confirm(msg)) return;
 
     // Unassign from any slot
     gameState.squadSlots.forEach(slot => {
