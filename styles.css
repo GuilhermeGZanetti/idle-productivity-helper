@@ -1,0 +1,713 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 15px;
+    font-size: 2em;
+}
+
+.resources {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.resource {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.tabs {
+    display: flex;
+    background: #f5f5f5;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab {
+    flex: 1;
+    padding: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s;
+}
+
+.tab:hover {
+    background: #e0e0e0;
+}
+
+.tab.active {
+    background: white;
+    color: #667eea;
+    border-bottom: 3px solid #667eea;
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    color: #333;
+}
+
+.btn-primary, .btn-secondary, .btn-large {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+}
+
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d0d0d0;
+}
+
+.btn-large {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background: #764ba2;
+    color: white;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-large:hover {
+    background: #5a3a7a;
+}
+
+.activities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.activity-card {
+    background: #f9f9f9;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.activity-card.completed {
+    border-color: #4caf50;
+    background: #e8f5e9;
+}
+
+.activity-info {
+    flex: 1;
+}
+
+.activity-name {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.activity-meta {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.activity-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.task-action-btn {
+    padding: 8px 12px;
+    font-size: 0.9em;
+}
+
+.reward-summary {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    display: none;
+}
+
+.reward-summary.show {
+    display: block;
+}
+
+.reward-item {
+    padding: 5px 0;
+    color: #4caf50;
+    font-weight: 600;
+}
+
+.war-table-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+.war-table-slot {
+    aspect-ratio: 1;
+    border: 3px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: white;
+    position: relative;
+}
+
+.war-table-slot.unlocked {
+    border-color: #667eea;
+    border-style: solid;
+}
+
+.war-table-slot.occupied {
+    border-color: #4caf50;
+    background: #e8f5e9;
+}
+
+.war-table-slot:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.slot-troop {
+    font-size: 2em;
+    margin-bottom: 5px;
+}
+
+.slot-info {
+    font-size: 0.8em;
+    color: #666;
+    text-align: center;
+}
+
+.war-table-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.battle-result {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    display: none;
+}
+
+.battle-result.show {
+    display: block;
+}
+
+.battle-result.victory {
+    background: #e8f5e9;
+    border: 2px solid #4caf50;
+}
+
+.battle-result.defeat {
+    background: #ffebee;
+    border: 2px solid #f44336;
+}
+
+.camp-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.camp-visual {
+    text-align: center;
+}
+
+.camp-building {
+    font-size: 8em;
+    margin: 20px;
+}
+
+.camp-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.camp-stat {
+    font-size: 1em;
+    color: #555;
+}
+
+.camp-locked {
+    font-size: 0.88em;
+    color: #999;
+}
+
+.upgrades-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.hero-card {
+    background: #f9f9f9;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.hero-main h3 {
+    margin-bottom: 6px;
+}
+
+.hero-main p {
+    color: #666;
+    font-size: 0.92em;
+    margin-bottom: 4px;
+}
+
+.hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.upgrade-card {
+    background: #f9f9f9;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upgrade-info h3 {
+    margin-bottom: 5px;
+}
+
+.upgrade-info p {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 2em;
+    cursor: pointer;
+    color: #666;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.modal-content label {
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-content input,
+.modal-content select {
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+#upgrade-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.upgrade-option {
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upgrade-option:hover {
+    border-color: #667eea;
+    background: #f0f0ff;
+}
+
+.upgrade-option h3 {
+    margin-bottom: 5px;
+}
+
+.upgrade-option p {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.upgrade-option .cost {
+    color: #667eea;
+    font-weight: 600;
+}
+
+/* ========== Battle Arena Overlay ========== */
+.battle-arena-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2000;
+    background: #1a1a2e;
+    flex-direction: column;
+}
+
+.battle-arena-overlay.show {
+    display: flex;
+}
+
+#battle-canvas {
+    flex: 1;
+    width: 100%;
+    display: block;
+}
+
+/* HUD */
+.battle-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 14px 20px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 70%, transparent 100%);
+    pointer-events: none;
+}
+
+.battle-hud-left {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.battle-hud-right {
+    flex: 0 0 auto;
+    pointer-events: auto;
+}
+
+.battle-hud-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+    pointer-events: auto;
+}
+
+/* Turn Banner */
+.turn-banner {
+    font-size: 1.3em;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+.turn-banner.player-turn { color: #64b5f6; }
+.turn-banner.enemy-turn  { color: #ff7043; }
+
+.turn-number {
+    color: #aaa;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.troop-counts {
+    color: #ccc;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* End Turn Button */
+.end-turn-btn {
+    padding: 10px 28px;
+    font-size: 1em;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.end-turn-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(102,126,234,0.5);
+}
+
+.end-turn-btn:disabled {
+    cursor: default;
+}
+
+/* Unit Info Panel */
+.unit-info-panel {
+    background: rgba(0,0,0,0.65);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 10px 18px;
+    min-width: 180px;
+    pointer-events: none;
+}
+
+.unit-info-panel.hidden {
+    display: none;
+}
+
+.unit-info-name {
+    color: #ffcc44;
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-transform: capitalize;
+}
+
+.unit-info-row {
+    display: flex;
+    justify-content: space-between;
+    color: #ccc;
+    font-size: 0.85em;
+    padding: 2px 0;
+}
+
+.unit-info-row span:first-child {
+    color: #999;
+    font-weight: 600;
+}
+
+/* Outcome overlay */
+.battle-outcome-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.55);
+    pointer-events: auto;
+}
+
+.battle-outcome-overlay.hidden {
+    display: none;
+}
+
+.battle-outcome-text {
+    font-size: 4em;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 30px;
+    letter-spacing: 0.1em;
+}
+
+.victory-text {
+    color: #ffdd44;
+    text-shadow: 0 0 30px rgba(255, 221, 68, 0.6), 0 4px 12px rgba(0,0,0,0.5);
+    animation: victoryPulse 1s ease-in-out infinite alternate;
+}
+
+.defeat-text {
+    color: #ff4444;
+    text-shadow: 0 0 30px rgba(255, 68, 68, 0.5), 0 4px 12px rgba(0,0,0,0.5);
+}
+
+@keyframes victoryPulse {
+    from { transform: scale(1); }
+    to   { transform: scale(1.06); }
+}
+
+.battle-close-btn {
+    pointer-events: auto;
+    max-width: 300px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: 2px solid rgba(255,255,255,0.3);
+    font-size: 1.2em;
+    padding: 14px 40px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.battle-close-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+}
+
+@media (max-width: 768px) {
+    .war-table-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        padding: 10px;
+    }
+    
+    .resources {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .battle-hud {
+        padding: 10px 12px;
+    }
+
+    .turn-banner {
+        font-size: 1em;
+    }
+
+    .end-turn-btn {
+        padding: 8px 18px;
+        font-size: 0.85em;
+    }
+
+    .unit-info-panel {
+        min-width: 140px;
+        padding: 8px 12px;
+    }
+
+    .battle-outcome-text {
+        font-size: 2.5em;
+    }
+}
