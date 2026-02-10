@@ -176,11 +176,16 @@ function getHeroById(heroId) {
 
 function getHeroStats(hero) {
     const heroClass = HERO_CLASSES[hero.classKey];
-    const levelBonus = Math.max(0, hero.level - 1);
     return {
-        hp: Math.floor(heroClass.baseHP + (levelBonus * heroClass.hpGrowth)),
-        damage: Math.floor(heroClass.baseDamage + (levelBonus * heroClass.damageGrowth))
+        hp: Math.floor(heroClass.baseHP + (hero.bonusHP || 0)),
+        damage: Math.floor(heroClass.baseDamage + (hero.bonusDamage || 0))
     };
+}
+
+// Normal-ish distribution between 1 and 3 (using sum of 3 uniform rolls, then mapping).
+function rollGrowthMultiplier() {
+    const sum = Math.random() + Math.random() + Math.random(); // 0-3, peaks around 1.5
+    return 1 + (sum / 3) * 2; // maps to 1-3, centered around 2
 }
 
 function getHeroUpgradeCost(hero) {
@@ -422,7 +427,9 @@ function recruitHero() {
         name: createPresetHeroName(),
         classKey: getRandomHeroClassKey(),
         level: 1,
-        xp: 0
+        xp: 0,
+        bonusHP: 0,
+        bonusDamage: 0
     });
     saveGameState();
     renderCamp();
@@ -442,8 +449,19 @@ function upgradeHero(heroId) {
 
     if (!confirm(`Upgrade ${hero.name} to level ${hero.level + 1} for ${cost} Strategic Points?`)) return;
 
+    const heroClass = HERO_CLASSES[hero.classKey];
+    const hpMult = rollGrowthMultiplier();
+    const dmgMult = rollGrowthMultiplier();
+    const hpGain = Math.floor(heroClass.hpGrowth * hpMult);
+    const dmgGain = Math.floor(heroClass.damageGrowth * dmgMult);
+
     gameState.strategicPoints -= cost;
     hero.level += 1;
+    hero.bonusHP = (hero.bonusHP || 0) + hpGain;
+    hero.bonusDamage = (hero.bonusDamage || 0) + dmgGain;
+
+    alert(`${hero.name} reached level ${hero.level}!\n+${hpGain} HP (x${hpMult.toFixed(1)}) • +${dmgGain} ATK (x${dmgMult.toFixed(1)})`);
+
     saveGameState();
     renderCamp();
     renderWarTable();
@@ -575,7 +593,9 @@ function createStarterHero() {
         name: 'Aldric',
         classKey: 'infantry',
         level: 1,
-        xp: 0
+        xp: 0,
+        bonusHP: 0,
+        bonusDamage: 0
     };
     gameState.heroes.push(starter);
     gameState.squadSlots[0].heroId = starter.id;
@@ -602,7 +622,9 @@ function migrateLegacySlot(slot) {
         name: createPresetHeroName(),
         classKey: legacyClass,
         level: Math.max(1, legacyLevel),
-        xp: legacyXP
+        xp: legacyXP,
+        bonusHP: 0,
+        bonusDamage: 0
     };
     gameState.heroes.push(hero);
     migrated.heroId = hero.id;
@@ -635,12 +657,19 @@ function loadGameState() {
             const classKey = HERO_CLASSES[rawHero.classKey] ? rawHero.classKey : 'infantry';
             const id = Number(rawHero.id);
             if (!Number.isInteger(id)) return;
+            const heroLevel = Math.max(1, Number(rawHero.level) || 1);
+            const heroClass = HERO_CLASSES[classKey];
+            // Migrate old saves: if no bonusHP, estimate from level * growth (x2 avg multiplier).
+            const defaultBonusHP = Number(rawHero.bonusHP) || ((heroLevel - 1) * heroClass.hpGrowth * 2);
+            const defaultBonusDmg = Number(rawHero.bonusDamage) || ((heroLevel - 1) * heroClass.damageGrowth * 2);
             gameState.heroes.push({
                 id,
                 name: rawHero.name || createPresetHeroName(),
                 classKey,
-                level: Math.max(1, Number(rawHero.level) || 1),
-                xp: Math.max(0, Number(rawHero.xp) || 0)
+                level: heroLevel,
+                xp: Math.max(0, Number(rawHero.xp) || 0),
+                bonusHP: Math.floor(defaultBonusHP),
+                bonusDamage: Math.floor(defaultBonusDmg)
             });
             gameState.nextHeroId = Math.max(gameState.nextHeroId, id + 1);
         });
