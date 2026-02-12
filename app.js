@@ -3,7 +3,7 @@ const TASK_CAMP_MULTIPLIER_STEP = 0.15;
 const TASK_STREAK_MULTIPLIER_STEP = 0.05;
 const HERO_RECRUIT_COST = 90;
 const HERO_DISMISS_REFUND = 40;
-const SLOT_UNLOCK_COST = 40;
+const SLOT_UNLOCK_COSTS = [30, 50, 70, 100, 150, 250, 400, 600];
 
 // Hero class definitions (reusing original troop archetypes).
 const HERO_CLASSES = {
@@ -194,6 +194,14 @@ function getHeroUpgradeCost(hero) {
     return Math.max(1, baseCost - xpDiscount);
 }
 
+function getSlotUnlockCost() {
+    const unlockedCount = gameState.squadSlots.filter(s => s.unlocked).length;
+    // unlockedCount is 1-based (you always start with 1 unlocked), so the next unlock index is unlockedCount - 1
+    const costIndex = unlockedCount - 1;
+    if (costIndex < 0 || costIndex >= SLOT_UNLOCK_COSTS.length) return Infinity;
+    return SLOT_UNLOCK_COSTS[costIndex];
+}
+
 function getCampTaskMultiplier() {
     return 1 + ((gameState.campLevel - 1) * TASK_CAMP_MULTIPLIER_STEP);
 }
@@ -231,7 +239,9 @@ function renderWarTable() {
         } else if (slot.unlocked) {
             slotEl.innerHTML = '<div class="slot-info">Click to assign hero</div>';
         } else {
-            slotEl.innerHTML = '<div class="slot-info">Locked</div>';
+            const cost = getSlotUnlockCost();
+            const costLabel = cost === Infinity ? 'Max' : `🔒 ${cost} ⚡`;
+            slotEl.innerHTML = `<div class="slot-info">${costLabel}</div>`;
         }
 
         grid.appendChild(slotEl);
@@ -245,13 +255,18 @@ function handleSlotClick(slotId) {
     if (!slot) return;
 
     if (!slot.unlocked) {
-        if (gameState.strategicPoints < SLOT_UNLOCK_COST) {
-            alert(`Need ${SLOT_UNLOCK_COST} Strategic Points to unlock this slot.`);
+        const cost = getSlotUnlockCost();
+        if (cost === Infinity) {
+            alert('All slots are unlocked!');
+            return;
+        }
+        if (gameState.strategicPoints < cost) {
+            alert(`Need ${cost} Strategic Points to unlock this slot.`);
             return;
         }
 
-        if (confirm(`Unlock this slot for ${SLOT_UNLOCK_COST} Strategic Points?`)) {
-            gameState.strategicPoints -= SLOT_UNLOCK_COST;
+        if (confirm(`Unlock this slot for ${cost} Strategic Points?`)) {
+            gameState.strategicPoints -= cost;
             slot.unlocked = true;
             saveGameState();
             renderWarTable();
