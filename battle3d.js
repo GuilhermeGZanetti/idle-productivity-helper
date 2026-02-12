@@ -38,7 +38,7 @@ const Battle3D = (() => {
     const ENEMY_POOL = [
         // Always available (tier 1, power >= 0)
         { type: 'infantry',   hpF: 1.0, dmgF: 1.0, mobility: 2, range: 1, minPower: 0   },
-        { type: 'ranged',     hpF: 0.5, dmgF: 0.7, mobility: 2, range: 4, minPower: 0   },
+        { type: 'ranged',     hpF: 0.5, dmgF: 0.7, mobility: 2, range: 3, minPower: 0   },
         // Tier 2 (power >= 500, ~camp level 5)
         { type: 'cavalry',    hpF: 0.8, dmgF: 1.1, mobility: 3, range: 1, minPower: 600 },
         { type: 'beasts',     hpF: 0.7, dmgF: 1.3, mobility: 3, range: 1, minPower: 2500 },

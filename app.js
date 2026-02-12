@@ -185,7 +185,7 @@ function getHeroStats(hero) {
 // Normal-ish distribution between 1 and 3 (using sum of 3 uniform rolls, then mapping).
 function rollGrowthMultiplier() {
     const sum = Math.random() + Math.random() + Math.random(); // 0-3, peaks around 1.5
-    return 1 + (sum / 3) * 2; // maps to 1-3, centered around 2
+    return 2 + (sum / 3) * 3; // maps to 2-5, centered around 3
 }
 
 function getHeroUpgradeCost(hero) {
