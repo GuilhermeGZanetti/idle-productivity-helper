@@ -43,8 +43,8 @@ const Battle3D = (() => {
         { type: 'cavalry',    hpF: 0.8, dmgF: 1.1, mobility: 3, range: 1, minPower: 600 },
         { type: 'beasts',     hpF: 0.7, dmgF: 1.3, mobility: 3, range: 1, minPower: 2500 },
         // Tier 3 (power >= 700, ~camp level 7)
-        { type: 'magic',      hpF: 0.5, dmgF: 1.2, mobility: 1, range: 3, minPower: 1100 },
-        { type: 'alchemists', hpF: 0.6, dmgF: 1.5, mobility: 2, range: 2, minPower: 1700 },
+        { type: 'magic',      hpF: 0.5, dmgF: 1.2, mobility: 1, range: 2, minPower: 1100 },
+        { type: 'alchemists', hpF: 0.6, dmgF: 1.5, mobility: 2, range: 1, minPower: 1700 },
         // Tier 4 (power >= 1200, ~camp level 12)
         { type: 'constructs', hpF: 2.5, dmgF: 1.0, mobility: 1, range: 1, minPower: 2800 },
     ];
