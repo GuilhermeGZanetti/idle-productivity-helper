@@ -435,13 +435,18 @@ const Battle3D = (() => {
         hpBar.position.set(pos.x, HEX_HEIGHT + 3.2, pos.z);
         troopGroup.add(hpBar);
 
+        const actionIndicator = createActionIndicator();
+        actionIndicator.position.set(pos.x, HEX_HEIGHT + 3.8, pos.z);
+        troopGroup.add(actionIndicator);
+
         const troop = {
             id, ...data,
             hasActed: false, alive: true,
-            mesh, hpBar
+            mesh, hpBar, actionIndicator
         };
         troops.push(troop);
         updateHPBar(troop);
+        updateActionIndicator(troop);
         return troop;
     }
 
@@ -670,6 +675,31 @@ const Battle3D = (() => {
         troop.hpBar.visible = troop.alive;
     }
 
+    // ===================== ACTION INDICATOR =====================
+
+    function createActionIndicator() {
+        const geo = new THREE.OctahedronGeometry(0.22, 0);
+        const mat = new THREE.MeshStandardMaterial({
+            color: 0xffd700,
+            emissive: 0xffa500,
+            emissiveIntensity: 0.6,
+            metalness: 0.4,
+            roughness: 0.3
+        });
+        const diamond = new THREE.Mesh(geo, mat);
+        diamond.scale.set(1, 1.4, 1);
+        return diamond;
+    }
+
+    function updateActionIndicator(troop) {
+        if (!troop.actionIndicator) return;
+        troop.actionIndicator.visible = troop.alive && !troop.hasActed && troop.side === 'player';
+    }
+
+    function updateAllActionIndicators() {
+        troops.forEach(t => updateActionIndicator(t));
+    }
+
     // ===================== HIGHLIGHTS =====================
 
     function clearHighlights() {
@@ -860,10 +890,8 @@ const Battle3D = (() => {
             return;
         }
 
-        // clicked own unspent troop → finish current without attack, select new
+        // clicked own unspent troop → switch selection without consuming previous troop's action
         if (troopAtHex && troopAtHex.side === 'player' && !troopAtHex.hasActed && troopAtHex.alive) {
-            const cur = getTroop(selectedTroopId);
-            if (cur) finishTroopAction(cur);
             selectTroop(troopAtHex.id);
             return;
         }
@@ -889,7 +917,8 @@ const Battle3D = (() => {
 
     function finishTroopAction(troop) {
         troop.hasActed = true;
-        if (troop.alive) dimTroop(troop); // only dim if still alive
+        if (troop.alive) dimTroop(troop);
+        updateActionIndicator(troop);
         selectedTroopId = null;
         clearHighlights();
         phase = 'playerSelect';
@@ -1029,10 +1058,11 @@ const Battle3D = (() => {
     }
 
     function killTroop(troop) {
-        if (!troop.alive) return; // already dead, prevent double-kill
+        if (!troop.alive) return;
         troop.alive = false;
         troop.hp = 0;
         updateHPBar(troop);
+        updateActionIndicator(troop);
 
         // snapshot the mesh position for the fall animation
         const fallStartY = troop.mesh.position.y;
@@ -1115,6 +1145,10 @@ const Battle3D = (() => {
                 troop.mesh.position.z = startPos.z + (target.z - startPos.z) * e;
                 troop.hpBar.position.x = troop.mesh.position.x;
                 troop.hpBar.position.z = troop.mesh.position.z;
+                if (troop.actionIndicator) {
+                    troop.actionIndicator.position.x = troop.mesh.position.x;
+                    troop.actionIndicator.position.z = troop.mesh.position.z;
+                }
                 if (t < 1) requestAnimationFrame(lerp);
                 else { step++; nextStep(); }
             }
@@ -1244,20 +1278,20 @@ const Battle3D = (() => {
         selectedTroopId = null;
         clearHighlights();
 
-        // reset all player troops
         troops.filter(t => t.side === 'player' && t.alive).forEach(t => {
             t.hasActed = false;
             undimTroop(t);
         });
+        updateAllActionIndicators();
         updateHUD();
     }
 
     function endPlayerTurn() {
-        // mark any unacted troops as acted
         troops.filter(t => t.side === 'player' && t.alive && !t.hasActed).forEach(t => {
             t.hasActed = true;
             dimTroop(t);
         });
+        updateAllActionIndicators();
         selectedTroopId = null;
         clearHighlights();
 
@@ -1478,11 +1512,13 @@ const Battle3D = (() => {
             }
         });
 
-        // idle bob for alive troops
         troops.forEach(tr => {
             if (!tr.alive) return;
-            if (phase !== 'animating') {
-                // gentle bob only when not animating
+            if (tr.actionIndicator && tr.actionIndicator.visible) {
+                tr.actionIndicator.position.x = tr.mesh.position.x;
+                tr.actionIndicator.position.z = tr.mesh.position.z;
+                tr.actionIndicator.position.y = HEX_HEIGHT + 3.8 + Math.sin(t * 3 + tr.id) * 0.15;
+                tr.actionIndicator.rotation.y = t * 2;
             }
         });
 
