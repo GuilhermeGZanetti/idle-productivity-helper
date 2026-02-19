@@ -100,7 +100,7 @@ const Battle3D = (() => {
     let hexMeshGroup, overlayGroup, troopGroup;
 
     // troops
-    let troops = [];             // { id, side, type, q, r, hp, maxHP, damage, mobility, range, hasActed, alive, mesh, hpBar }
+    let troops = [];             // { id, side, type, q, r, hp, maxHP, damage, mobility, range, hasMoved, hasAttacked, alive, mesh, hpBar }
     let nextTroopId = 1;
 
     // turn state
@@ -441,7 +441,7 @@ const Battle3D = (() => {
 
         const troop = {
             id, ...data,
-            hasActed: false, alive: true,
+            hasMoved: false, hasAttacked: false, alive: true,
             mesh, hpBar, actionIndicator
         };
         troops.push(troop);
@@ -843,11 +843,10 @@ const Battle3D = (() => {
             animateMovement(troop, path, () => {
                 troop.q = hitHex.q;
                 troop.r = hitHex.r;
-                // after moving, go to attack phase
+                troop.hasMoved = true;
                 phase = 'playerAttack';
                 showHighlights(selectedTroopId);
                 updateHUD();
-                // if no attack targets, skip attack
                 if (attackTargets.size === 0) {
                     finishTroopAction(troop);
                 }
@@ -868,7 +867,7 @@ const Battle3D = (() => {
         }
 
         // clicked own unspent troop → select it
-        if (troopAtHex && troopAtHex.side === 'player' && !troopAtHex.hasActed && troopAtHex.alive) {
+        if (troopAtHex && troopAtHex.side === 'player' && !(troopAtHex.hasMoved && troopAtHex.hasAttacked) && troopAtHex.alive) {
             selectTroop(troopAtHex.id);
             return;
         }
@@ -891,7 +890,7 @@ const Battle3D = (() => {
         }
 
         // clicked own unspent troop → switch selection without consuming previous troop's action
-        if (troopAtHex && troopAtHex.side === 'player' && !troopAtHex.hasActed && troopAtHex.alive) {
+        if (troopAtHex && troopAtHex.side === 'player' && !(troopAtHex.hasMoved && troopAtHex.hasAttacked) && troopAtHex.alive) {
             selectTroop(troopAtHex.id);
             return;
         }
@@ -903,7 +902,8 @@ const Battle3D = (() => {
 
     function selectTroop(id) {
         selectedTroopId = id;
-        phase = 'playerMove';
+        const troop = getTroop(id);
+        phase = (troop && troop.hasMoved) ? 'playerAttack' : 'playerMove';
         showHighlights(id);
         updateHUD();
     }
@@ -916,7 +916,11 @@ const Battle3D = (() => {
     }
 
     function finishTroopAction(troop) {
-        troop.hasActed = true;
+        troop.hasMoved = true;
+        troop.hasAttacked = true;
+        if (troop.hasMoved && troop.hasAttacked) {
+            troop.hasActed = true;
+        }
         if (troop.alive) dimTroop(troop);
         updateActionIndicator(troop);
         selectedTroopId = null;
@@ -924,11 +928,9 @@ const Battle3D = (() => {
         phase = 'playerSelect';
         updateHUD();
 
-        // check if battle is over
         if (checkBattleEnd()) return;
 
-        // auto-end turn if all player troops have acted
-        const unacted = troops.filter(t => t.side === 'player' && t.alive && !t.hasActed);
+        const unacted = troops.filter(t => t.side === 'player' && t.alive && !(t.hasMoved && t.hasAttacked));
         if (unacted.length === 0) {
             setTimeout(() => endPlayerTurn(), 400);
         }
@@ -1279,6 +1281,8 @@ const Battle3D = (() => {
         clearHighlights();
 
         troops.filter(t => t.side === 'player' && t.alive).forEach(t => {
+            t.hasMoved = false;
+            t.hasAttacked = false;
             t.hasActed = false;
             undimTroop(t);
         });
@@ -1287,6 +1291,9 @@ const Battle3D = (() => {
     }
 
     function endPlayerTurn() {
+        troops.filter(t => t.side === 'player' && t.alive && t.hasMoved && t.hasAttacked).forEach(t => {
+            t.hasActed = true;
+        });
         troops.filter(t => t.side === 'player' && t.alive && !t.hasActed).forEach(t => {
             t.hasActed = true;
             dimTroop(t);
